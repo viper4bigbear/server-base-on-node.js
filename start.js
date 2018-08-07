@@ -23,7 +23,7 @@ let server = http.createServer((request, response) => {
           </head><body>
           <h1>Index of${request.url}</h1>
           <ul>
-            <li><a href="javascript:history.back(-1)">../</a></li>
+            <li><a href="javascript:history.back(-1)">..</a></li>
             ${str}
           </ul>
           </body></html>
