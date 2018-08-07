@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const http = require('http')
-
+const mime = require('mime')
 let rootPath = path.join(__dirname, 'www')
 // console.log(rootPath)
 let server = http.createServer((request, response) => {
@@ -9,25 +9,34 @@ let server = http.createServer((request, response) => {
   if (fs.existsSync(targetPath)) {
     fs.stat(targetPath, (err, stats) => {
       if (stats.isDirectory()) {
-        fs.readdir(targetPath, (err, data) => {
+        fs.readdir(targetPath, (err, files) => {
+          var str = ''
+          for (let i = 0; i < files.length; i++) {
+            var url = path.join(request.url, files[i])
+            str += `<li><a href="${url}">${files[i]}</a></li>`
+          }
           response.setHeader('content-type', 'text/html;charset=utf-8')
           response.end(`
           <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
           <html><head>
-          <title>${request.url}</title>
+          <title>Index of/</title>
           </head><body>
-          <h1>文件目录</h1>
+          <h1>Index of${request.url}</h1>
           <ul>
-            
+            <li><a href="javascript:history.back(-1)">../</a></li>
+            ${str}
           </ul>
           </body></html>
           `)
         })
       } else if (stats.isFile()) {
+        response.setHeader(
+          'content-type',
+          `${mime.getType(targetPath)};charset=utf-8`
+        )
         fs.readFile(targetPath, (err, data) => {
           response.end(data)
         })
-
       }
     })
   } else {
