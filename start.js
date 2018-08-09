@@ -6,6 +6,31 @@ let rootPath = path.join(__dirname, 'www')
 // console.log(rootPath)
 let server = http.createServer((request, response) => {
   let targetPath = path.join(rootPath, request.url)
+  if (request.url == '/index.food') {
+    fs.readFile('./data/food.json', (err, data) => {
+      if (err) {
+        respnse.end(err)
+      } else {
+        // console.log(data)
+        let foodData = JSON.parse(data)
+        // console.log(foodData)
+        let tem = ''
+        foodData.forEach(e => {
+          tem += `<li>${e}</li>`
+        });
+        fs.readFile('./template/index.html', (err, data) => {
+          if (err) {
+            respnse.end(err)
+          } else {
+            tem = data.toString().replace('${tem}', tem)
+            response.end(tem)
+          }
+        })
+
+      }
+    })
+    return
+  }
   if (fs.existsSync(targetPath)) {
     fs.stat(targetPath, (err, stats) => {
       if (stats.isDirectory()) {
@@ -54,5 +79,5 @@ let server = http.createServer((request, response) => {
   }
 })
 server.listen(80, '127.0.0.1', () => {
-  console.log('service start')
+  console.log('server start')
 })
